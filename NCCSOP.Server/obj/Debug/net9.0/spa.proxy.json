@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:62642",
+"RedirectUrl": "",
+"LaunchCommand": "npm run dev",
+"WorkingDirectory": "C:\\Users\\Jaren\\source\\repos\\NCCSOP\\NCCSOP.Server\\..\\nccsop.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}

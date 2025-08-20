@@ -1,0 +1,6 @@
+@NCCSOP.Server_HostAddress = http://localhost:5125
+
+GET {{NCCSOP.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
