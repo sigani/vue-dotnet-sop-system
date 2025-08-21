@@ -10,3 +10,5 @@
 /NCCSOP.Server/obj/
 /NCCSOP.Server/appsettings.Development.json
 /NCCSOP.Server/appsettings*.json
+/NCCSOP.Server/bin/Debug/net9.0/appsettings.Development.json
+/NCCSOP.Server/bin/Debug/net9.0/appsettings.json
