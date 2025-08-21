@@ -9,3 +9,4 @@
 /NCCSOP.Server/bin/
 /NCCSOP.Server/obj/
 /NCCSOP.Server/appsettings.Development.json
+/NCCSOP.Server/appsettings*.json
