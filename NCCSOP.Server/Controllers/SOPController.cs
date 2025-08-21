@@ -62,5 +62,18 @@ namespace NCCSOP.Server.Controllers
 
             return Ok(sop);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var sop = await _db.SOPs.FindAsync(id);
+            if (sop == null)
+                return NotFound();
+
+            _db.SOPs.Remove(sop);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
