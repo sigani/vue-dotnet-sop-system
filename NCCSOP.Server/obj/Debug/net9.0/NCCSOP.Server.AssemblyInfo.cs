@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NCCSOP.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+52bd4b0a9fec342f499a3c681b41f51f5965a9ea")]
 [assembly: System.Reflection.AssemblyProductAttribute("NCCSOP.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NCCSOP.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

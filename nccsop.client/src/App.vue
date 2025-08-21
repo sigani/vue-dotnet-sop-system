@@ -44,13 +44,11 @@
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click="sidebar = !sidebar"/>
       <v-toolbar-title>NCCSOP</v-toolbar-title>
-
-        <v-breadcrumbs :items="breadcrumbs" />
-
+      <v-breadcrumbs :items="breadcrumbs" />
     </v-app-bar>
 
     <!-- Side Navigation -->
-    <v-navigation-drawer app permanent v-if="sidebar">
+    <v-navigation-drawer app v-if="sidebar">
       <v-list>
         <v-list-item title="SOPs" to="/category"></v-list-item>
         <v-list-item title="Settings" to="/settings"></v-list-item>

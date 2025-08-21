@@ -5,11 +5,19 @@ import axios from 'axios'
 
 export const useCategoryStore = defineStore('categoryStore', () => {
   const categoriesMap = ref<{ [id: number]: any }>({})
-
   const fetchCategories = async () => {
     const response = await axios.get('https://localhost:7269/api/category')
     categoriesMap.value = response.data.reduce((map: any, c: any) => {
       map[c.id] = c
+      return map
+    }, {})
+  }
+
+  const sopsMap = ref<{ [id: number]: any }>({})
+  const fetchSops = async () => {
+    const response = await axios.get('https://localhost:7269/api/sop')
+    sopsMap.value = response.data.reduce((map: any, s: any) => {
+      map[s.id] = s
       return map
     }, {})
   }
@@ -24,50 +32,34 @@ export const useCategoryStore = defineStore('categoryStore', () => {
     )
   })
 
+  const childSops = computed(() => {
+    if (!activeCategoryId.value) return []
+    return Object.values(sopsMap.value).filter(
+      (s: any) => s.categoryId === activeCategoryId.value
+    )
+  })
+
   const rootCategories = computed(() => {
     return Object.values(categoriesMap.value).filter(
       (c: any) => !c.parentCategoryId // top-level
     )
   })
 
+  const rootSOPs = computed(() => {
+    return Object.values(sopsMap.value).filter(
+      (s: any) => !s.categoryId
+    )
+  })
+
   return {
     categoriesMap,
+    sopsMap,
     fetchCategories,
     activeCategoryId,
     childCategories,
-    rootCategories
+    rootCategories,
+    fetchSops,
+    childSops,
+    rootSOPs
   }
 })
-
-
-
-//import { defineStore } from 'pinia'
-//import axios from 'axios'
-
-//export interface Category {
-//  id: number
-//  name: string
-//  parentCategoryId: number | null
-//}
-
-//export const useCategoryStore = defineStore('category', {
-//  state: () => ({
-//    categoriesMap: {} as Record<number, Category>,
-//    loaded: false,
-//  }),
-//  actions: {
-//    async fetchCategories() {
-//      if (this.loaded) return // avoid fetching twice
-//      try {
-//        const response = await axios.get<Category[]>('https://localhost:7269/api/category')
-//        this.categoriesMap = response.data.reduce((acc, cat) => {
-//          acc[cat.id] = cat
-//          return acc
-//        }, {} as Record<number, Category>)
-//        this.loaded = true
-//      } catch (error) {
-//        console.error('Failed to fetch categories:', error)
-//      }
-//    }
-//  }
-//})

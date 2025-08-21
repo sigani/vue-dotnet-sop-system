@@ -1,7 +1,21 @@
 <template>
   <v-container fluid>
     <v-row class="ma-0" style="flex-wrap: wrap; gap: 16px;">
-      <!-- Loop over categories from the store -->
+      <template v-if="loading">
+        <v-col v-for="n in 9"
+               :key="n"
+               cols="auto"
+               style="flex: 0 0 calc(20% - 16px);">
+          <v-card class="mx-auto" width="270">
+            <!--Image skeleton-->
+            <v-skeleton-loader type="image"
+                               height="100%"
+                               class="position-relative" />
+          </v-card>
+        </v-col>
+      </template>
+
+      <!-- This is for top level categories -->
       <template v-if="!categoryStore.activeCategoryId">
         <v-col v-for="category in categoryStore.rootCategories"
                :key="category.id"
@@ -12,12 +26,39 @@
                    height="250"
                    color="grey"
                    cover>
-              <v-card-text class="text-h6">{{ category.name }}</v-card-text>
+
+              <div class="position-absolute" style="top: 8px; right: 8px;">
+                <v-menu open-on-hover>
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props"
+                           icon
+                           variant="text"
+                           size="small">
+                      <v-icon icon="mdi-menu"></v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item @click="">
+                      <v-list-item-title>Edit</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="">
+                      <v-list-item-title style="color: red;">Delete</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+
+              <v-card-text class="text-h6">
+                {{ category.name }}
+              </v-card-text>
+
             </v-img>
           </v-card>
         </v-col>
       </template>
 
+      <!-- These are sub categories-->
       <v-col v-for="category in categoryStore.childCategories"
              :key="category.id"
              cols="auto"
@@ -27,7 +68,108 @@
                  height="250"
                  color="grey"
                  cover>
+            <div class="position-absolute" style="top: 8px; right: 8px;">
+              <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props"
+                         icon
+                         variant="text"
+                         size="small">
+                    <v-icon icon="mdi-menu"></v-icon>
+                  </v-btn>
+                </template>
+
+                <v-list>
+                  <v-list-item @click="">
+                    <v-list-item-title>Edit</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="">
+                    <v-list-item-title style="color: red;">Delete</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
             <v-card-text class="text-h6">{{ category.name }}</v-card-text>
+          </v-img>
+        </v-card>
+      </v-col>
+
+      <!-- These are the root SOPs-->
+      <template v-if="!categoryStore.activeCategoryId">
+        <v-col v-for="sop in categoryStore.rootSOPs"
+               :key="sop.id"
+               cols="auto"
+               style="flex: 0 0 calc(20% - 16px);">
+          <v-card class="mx-auto" width="270" :to="`/sop/${sop.id}`">
+            <v-img class="align-end text-white"
+                   height="250"
+                   color="cyan"
+                   cover>
+
+              <div class="position-absolute" style="top: 8px; right: 8px;">
+                <v-menu open-on-hover>
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props"
+                           icon
+                           variant="text"
+                           size="small">
+                      <v-icon icon="mdi-menu"></v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item @click="">
+                      <v-list-item-title>Edit</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="">
+                      <v-list-item-title style="color: red;">Delete</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
+
+              <v-card-text class="text-h6">
+                {{ sop.name }}
+              </v-card-text>
+
+            </v-img>
+          </v-card>
+        </v-col>
+      </template>
+
+      <!-- These are the SOPs -->
+      <v-col v-for="sop in categoryStore.childSops"
+             :key="sop.id"
+             cols="auto"
+             style="flex: 0 0 calc(20% - 16px);">
+        <v-card class="mx-auto" width="270" :to="`/sop/${sop.id}`">
+          <v-img class="align-end text-white"
+                 height="250"
+                 color="cyan"
+                 cover>
+            <div class="position-absolute" style="top: 8px; right: 8px;">
+              <v-menu open-on-hover>
+                <template v-slot:activator="{ props }">
+                  <v-btn v-bind="props"
+                         icon
+                         variant="text"
+                         size="small">
+                    <v-icon icon="mdi-menu"></v-icon>
+                  </v-btn>
+                </template>
+
+                <v-list>
+                  <v-list-item @click="">
+                    <v-list-item-title>Edit</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="">
+                    <v-list-item-title style="color: red;">Delete</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+
+            <v-card-text class="text-h6">{{ sop.name }}</v-card-text>
           </v-img>
         </v-card>
       </v-col>
@@ -40,6 +182,8 @@
           </v-img>
         </v-card>
       </v-col>
+
+
 
       <!-- Dialog -->
       <v-dialog v-model="dialog" max-width="500">
@@ -80,13 +224,21 @@
   import { ref, computed, onMounted, watch } from 'vue'
   import { useCategoryStore } from '@/stores/categoryStore'
   import { createCategory } from '@/services/categoryService'
+  import { createSOP } from '@/services/sopService'
   import { useRoute } from 'vue-router'
 
+  const image = ref<File | null>(null)
   const selectedType = ref('')
   const route = useRoute()
   const categoryStore = useCategoryStore()
-  onMounted(() => {
-    categoryStore.fetchCategories()
+  const loading = ref(true)
+
+  onMounted(async () => {
+    await Promise.all([
+      categoryStore.fetchCategories(),
+      categoryStore.fetchSops()
+    ])
+    loading.value = false
   })
 
   watch(
@@ -119,30 +271,46 @@
     const isDuplicate = Object.values(categoryStore.categoriesMap).some(
       (c) => c.name.toLowerCase() === trimmedName.toLowerCase()
     )
-    if (isDuplicate) {
+    if (isDuplicate && selectedType.value == "cat") {
       snackbarMessage.value = 'Category name must be unique.'
       snackbar.value = true
       return
     }
 
     // add to db
-    try {
-      const response = await createCategory({
-        name: newName.value,
-        parentCategoryId: route.params.id ? route.params.id : null,
-      })
+    if (selectedType.value == "cat") {
+      try {
+        const response = await createCategory({
+          name: newName.value,
+          parentCategoryId: route.params.id ? route.params.id : null,
+        })
 
-      const createdCategory = response.data
-      categoryStore.categoriesMap[createdCategory.id] = createdCategory
-      console.log('Created category:', response.data)
-    } catch (error) {
-      console.error('Failed to create category:', error)
+        const createdCategory = response.data
+        categoryStore.categoriesMap[createdCategory.id] = createdCategory
+
+        snackbarMessage.value = 'Category created successfully!'
+        console.log('Created category:', response.data)
+      } catch (error) {
+        console.error('Failed to create category:', error)
+      }
+    } else if (selectedType.value == "sop") {
+      try {
+        const response = await createSOP({
+          name: newName.value,
+          categoryId: route.params.id ? route.params.id : null,
+        })
+
+        const createdSOP = response.data
+        categoryStore.sopsMap[createdSOP.id] = createdSOP
+        snackbarMessage.value = 'SOP created successfully!'
+      } catch (error) {
+        snackbarMessage.value = error
+      }
     }
 
     // Reset
     newName.value = ''
     dialog.value = false
-    snackbarMessage.value = 'Category created successfully!'
     snackbar.value = true
   }
 </script>

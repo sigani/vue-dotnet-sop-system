@@ -149,6 +149,7 @@ C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\NCCSOP.Server.
 C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\NCCSOP.Server.csproj.CoreCompileInputs.cache
 C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\NCCSOP.Server.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\NCCSOP.Server.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\NCCSOP.Server.sourcelink.json
 C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\rjimswa.dswa.cache.json
 C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 C:\Users\Jaren\source\repos\NCCSOP\NCCSOP.Server\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
