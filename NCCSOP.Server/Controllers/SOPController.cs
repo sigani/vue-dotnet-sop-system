@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NCCSOP.Server.Data;
 using NCCSOP.Server.Models;
 using NCCSOP.Server.Data.DTOs;
+using System.Diagnostics;
 
 namespace NCCSOP.Server.Controllers
 {
@@ -35,7 +36,7 @@ namespace NCCSOP.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SOP sop)
         {
-            System.Diagnostics.Debug.WriteLine("hello??");
+            Debug.WriteLine("hello??");
             if (sop == null)
                 return BadRequest();
 
@@ -45,67 +46,108 @@ namespace NCCSOP.Server.Controllers
             _db.SOPs.Add(sop);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetSOP), new { id = sop.Id }, sop);
+            return CreatedAtAction(nameof(GetSOPDetails), new { id = sop.Id }, sop);
         }
 
         [HttpPost("{id}")]
-        public async Task<IActionResult> InsertSopItem(int id)
+        public async Task<IActionResult> InsertSopItem(int id, [FromForm] SOPItemDto dto)
         {
+            if(string.IsNullOrEmpty(dto.Name) && string.IsNullOrEmpty(dto.Content) && dto.Image == null)
+            {
+                return BadRequest(new { message = "At least one field must be populated" });
+            }
+
             try
             {
-                if (Request.HasFormContentType)
+                var filePath = "";
+                var fileExtension = "";
+                var uniqueFileName = "";
+                if (dto.Image != null)
                 {
-                    // Handle form-data (with file)
-                    var form = await Request.ReadFormAsync();
+                    // Handle form-data
+                    fileExtension = Path.GetExtension(dto.Image.FileName);
+                    uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                    var uploadsFolder = Path.Combine("uploads");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                    var dto = new SOPItemFormDto
-                    {
-                        SopId = int.Parse(form["SopId"]),
-                        Content = form["Content"],
-                        SortOrder = int.Parse(form["SortOrder"]),
-                        Image = form.Files["Image"]
-                    };
+                    filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    if (dto.Image != null)
-                    {
-                        var filePath = Path.Combine("uploads", dto.Image.FileName);
-
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await dto.Image.CopyToAsync(stream);
-                        }
-                    }
-
-                    // Save dto to DB, etc.
-                    return Ok(new { message = "Handled form-data upload" });
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                        await dto.Image.CopyToAsync(stream);
                 }
-                else
+
+                var item = new SOPItem
                 {
-                    // Handle JSON
-                    var dto = await System.Text.Json.JsonSerializer.DeserializeAsync<SOPItemJsonDto>(Request.Body);
+                    SOPId = dto.SopId,
+                    Name = dto.Name,
+                    Content = dto.Content,
+                    SortOrder = dto.SortOrder,
+                    ImagePath = uniqueFileName
+                };
 
-                    // Save dto.Content, dto.SortOrder, etc.
-                    return Ok(new { message = "Handled JSON request" });
-                }
+                await _db.SOPItems.AddAsync(item);
+                await _db.SaveChangesAsync();
+
+                return Ok(new { message = "Item successfully created", savedItem = item });
+              
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("image/{fileName}")]
+        public IActionResult GetImage(string fileName)
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+            var path = Path.Combine(uploadsFolder, fileName);
+
+            if (!System.IO.File.Exists(path))
+                return NotFound();
+
+            var fileExt = Path.GetExtension(fileName).ToLower();
+            var contentType = fileExt switch
+            {
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+
+            var fileBytes = System.IO.File.ReadAllBytes(path);
+            return File(fileBytes, contentType);
+        }
+
         // GET api/sop/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetSOP(int id)
+        public async Task<IActionResult> GetSOPDetails(int id)
         {
             var sop = await _db.SOPs
-                .Include(s => s.SOPItems)
-                .Include(s => s.Category)
+                .Include(s => s.SOPItems.OrderBy(i => i.SortOrder))
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (sop == null)
                 return NotFound();
 
             return Ok(sop);
+        }
+
+        [HttpDelete("{sopId}/{detailId}")]
+        public async Task<IActionResult> DeleteDetail(int sopId, int detailId)
+        {
+            // Find the SOPItem with the matching SOPId and Id
+            var item = await _db.SOPItems
+                .FirstOrDefaultAsync(i => i.SOPId == sopId && i.Id == detailId);
+
+            if (item == null)
+                return NotFound("SOP item not found");
+
+            _db.SOPItems.Remove(item);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "SOP item deleted successfully" });
         }
 
         [HttpDelete("{id}")]

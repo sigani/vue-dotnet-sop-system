@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NCCSOP.Server.Models
 {
@@ -26,21 +27,22 @@ namespace NCCSOP.Server.Models
         /// </summary>
         public int SOPId { get; set; }
 
+        [JsonIgnore]
         /// <summary>
         /// The parent SOP that this item belongs to.
         /// </summary>
         public SOP SOP { get; set; } = null!;
 
         /// <summary>
-        /// The type of the SOP item (Text, Image, or Step).
+        /// Name of step
         /// </summary>
-        public SOPItemType Type { get; set; } = SOPItemType.Text;
+        public string? Name { get; set; } = null!;
 
         /// <summary>
         /// The main content of the item.
         /// For Text or Step types, this contains the textual description.
         /// </summary>
-        public string Content { get; set; } = string.Empty;
+        public string? Content { get; set; } = string.Empty;
 
         /// <summary>
         /// The URL or file path of an image, if the item type is Image.
