@@ -1,11 +1,39 @@
-# How to run
-This is all pretty simple in Visual Studio just build both projects (right click both folders and click "Build") then run.
+# How to Run
 
-If not using Visual Studio
-- Build the frontend by going into the `nccsop.client` project and running `npm build`
-- Build the backend by going into the `NCCSOP.server` project and running `dotnet build`
-- Create/update the database by running `dotnet ef database update`
-    - you do need sqlserver/sqlexpress
-- run the backend and the frontend projects.
-- note: inside `authService.ts`, you will need to change the authority or just omit authentication overall if you don't already have an idp.
-    - authentication uses OAuth 2.0 Authorization Code Flow with OpenID Connect.
+Running the project in **Visual Studio** is straightforward:
+
+1. Build both projects by right-clicking on each folder and selecting **Build**.  
+2. Run the solution.
+
+---
+
+## Environment Setup
+Before running the project, you need to create environment files.  This project will not work without these files.
+
+1. Create `.env.development` and `.env.production` in the `nccsop.client` folder.  
+2. Copy the contents of `.env.example` into each file.  
+
+   You can do this manually, or via the command line:
+
+   ```bash
+   cp .env.example .env.development
+   cp .env.example .env.production
+
+## If not using Visual Studio
+- Frontend
+      - Navigate to the nccsop.client folder and run:
+      - `npm run build`
+- Backend
+      - Navigate to the NCCSOP.server folder and run:
+      - `dotnet build`
+- Database
+      - Update or create the database using Entity Framework:
+      - `dotnet ef database update`
+  > **_NOTE:_**  SQL Server or SQL Express is required.
+- Run both the backend and frontend projects.
+
+## Authentication notes
+- The project uses OAuth 2.0 Authorization Code Flow with OpenID Connect.
+- If you do not have an Identity Provider (IdP), you can either:
+    - Update authService.ts to point to a valid authority, or
+    - Omit authentication entirely for testing purposes.
