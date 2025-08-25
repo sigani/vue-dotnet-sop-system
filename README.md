@@ -17,6 +17,8 @@ Before running the project, you need to create environment files.  This project 
    ```bash
    cp .env.example .env.development
    cp .env.example .env.production
+   ```
+ 3.  The client_id and client_secret can be found in the 1Password.
 
 ## If not using Visual Studio
 - Frontend
