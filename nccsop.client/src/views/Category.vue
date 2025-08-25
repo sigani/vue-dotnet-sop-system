@@ -1,6 +1,7 @@
 <template>
   <v-container fluid>
     <v-row class="ma-0" style="flex-wrap: wrap; gap: 16px;">
+      <!-- Loading Skeleton (unused for now) -->
       <template v-if="loading">
         <v-col v-for="n in 9"
                :key="n"
@@ -225,6 +226,7 @@
         </v-card>
       </v-dialog>
     </v-row>
+
   </v-container>
 
   <!-- Snackbar -->

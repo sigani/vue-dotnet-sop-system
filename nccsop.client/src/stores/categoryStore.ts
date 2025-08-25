@@ -5,23 +5,55 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-export const useCategoryStore = defineStore('categoryStore', () => {
-  const categoriesMap = ref<{ [id: number]: number[] }>({})
-  const fetchCategories = async () => {
+const fetchCategories = async () => {
+  try {
     const response = await axios.get(API_URL + '/category')
     categoriesMap.value = response.data.reduce((map: any, c: any) => {
       map[c.id] = c
       return map
     }, {})
+  } catch (err: any) {
+    if (axios.isAxiosError(err)) {
+      console.error('AxiosError fetching categories:', err.message, err.response?.status, err.response?.data)
+    } else {
+      console.error('Unknown error fetching categories:', err)
+    }
+  }
+}
+
+export const useCategoryStore = defineStore('categoryStore', () => {
+  const categoriesMap = ref<{ [id: number]: number[] }>({})
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(API_URL + '/category')
+      categoriesMap.value = response.data.reduce((map: any, c: any) => {
+        map[c.id] = c
+        return map
+      }, {})
+    } catch (err: any) {
+      if (axios.isAxiosError(err)) {
+        console.error('AxiosError fetching categories:', err.message, err.response?.status, err.response?.data)
+      } else {
+        console.error('Unknown error fetching categories:', err)
+      }
+    }
   }
 
   const sopsMap = ref<{ [id: number]: number[] }>({})
   const fetchSops = async () => {
-    const response = await axios.get(API_URL + '/sop')
-    sopsMap.value = response.data.reduce((map: any, s: any) => {
-      map[s.id] = s
-      return map
-    }, {})
+    try {
+      const response = await axios.get(API_URL + '/sop')
+      sopsMap.value = response.data.reduce((map: any, s: any) => {
+        map[s.id] = s
+        return map
+      }, {})
+    } catch (err: any) {
+      if (axios.isAxiosError(err)) {
+        console.error('AxiosError fetching sops:', err.message, err.response?.status, err.response?.data)
+      } else {
+        console.error('Unknown error fetching sops:', err)
+      }
+    }
   }
 
   const fetchSopDetails = async (id: number) => {
