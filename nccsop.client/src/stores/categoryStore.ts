@@ -3,24 +3,36 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 export const useCategoryStore = defineStore('categoryStore', () => {
-  const categoriesMap = ref<{ [id: number]: any }>({})
+  const categoriesMap = ref<{ [id: number]: number[] }>({})
   const fetchCategories = async () => {
-    const response = await axios.get('https://localhost:7269/api/category')
+    const response = await axios.get(API_URL + '/category')
     categoriesMap.value = response.data.reduce((map: any, c: any) => {
       map[c.id] = c
       return map
     }, {})
   }
 
-  const sopsMap = ref<{ [id: number]: any }>({})
+  const sopsMap = ref<{ [id: number]: number[] }>({})
   const fetchSops = async () => {
-    const response = await axios.get('https://localhost:7269/api/sop')
+    const response = await axios.get(API_URL + '/sop')
     sopsMap.value = response.data.reduce((map: any, s: any) => {
       map[s.id] = s
       return map
     }, {})
   }
+
+  const fetchSopDetails = async (id: number) => {
+    try {
+      const response = await axios.get(API_URL + `/sop/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch SOP details:', error);
+      return null; // or handle default/fallback value
+    }
+  };
 
   const activeCategoryId = ref<number | null>(null)
 
@@ -59,6 +71,7 @@ export const useCategoryStore = defineStore('categoryStore', () => {
     childCategories,
     rootCategories,
     fetchSops,
+    fetchSopDetails,
     childSops,
     rootSOPs
   }

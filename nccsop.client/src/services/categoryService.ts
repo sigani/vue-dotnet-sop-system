@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base API URL (adjust if your backend runs on a different port)
-const API_URL = 'https://localhost:7269/api/category';
+const API_URL = import.meta.env.VITE_API_URL + '/category';
 
 export function getAllCategories() {
   return axios.get(API_URL);

@@ -1,26 +1,42 @@
 <<script setup lang="ts">
   import { computed, onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useCategoryStore } from '@/stores/categoryStore'
 
   const route = useRoute()
+  const router = useRouter()
   const categoryStore = useCategoryStore()
   const sidebar = ref(false)
 
   onMounted(async () => {
     await categoryStore.fetchCategories()
+    await categoryStore.fetchSops()
   })
 
   // Function to build breadcrumb array
-  function buildBreadcrumbs(id: number) {
+  function buildBreadcrumbs(id: number, isSop: boolean) {
     const breadcrumbs: { title: string; to: string; disabled?: boolean }[] = []
     let currentId: number | null = id
 
     while (currentId) {
-      const cat = categoryStore.categoriesMap[currentId]
-      if (!cat) break
-      breadcrumbs.unshift({ title: cat.name, to: `/category/${currentId}` })
-      currentId = cat.parentCategoryId
+      if (isSop) {
+        const sop = categoryStore.sopsMap[currentId]
+        if (!sop || !sop.name) {
+          return null // invalid
+        }
+
+        breadcrumbs.unshift({ title: sop.name, to: `/`, disabled: true })
+        currentId = sop.categoryId
+        isSop = false
+      } else {
+        const cat = categoryStore.categoriesMap[currentId]
+        if (!cat || !cat.name) {
+          return null // invalid
+        }
+
+        breadcrumbs.unshift({ title: cat.name, to: `/category/${currentId}` })
+        currentId = cat.parentCategoryId
+      }
     }
 
     breadcrumbs.unshift({ title: 'Home', to: '/' })
@@ -28,12 +44,28 @@
   }
 
   const breadcrumbs = computed(() => {
-    const idParam = route.params.id
+    let idParam = route.params.id
+    let isSop = false
+
+    if (!idParam) {
+      isSop = true
+      idParam = route.params.sopId
+    }
+
     if (!idParam) return [{ title: 'Home', to: '/' }]
 
     const id = Number(idParam)
-    const items = buildBreadcrumbs(id)
-    if (items.length > 0) items[items.length - 1].disabled = true
+    const items = buildBreadcrumbs(id, isSop)
+
+    if (!items) {
+      router.push('/') // redirect to Home
+      return [{ title: 'Home', to: '/' }] // <-- always return array
+    }
+
+    if (items.length > 0) {
+      items[items.length - 1].disabled = true
+    }
+
     return items
   })
 </script>
@@ -43,7 +75,9 @@
     <!-- Header / Top Navigation -->
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click="sidebar = !sidebar"/>
-      <v-toolbar-title>NCCSOP</v-toolbar-title>
+      <v-btn to="/category">
+        <v-toolbar-title >NCCSOP</v-toolbar-title>
+      </v-btn>
       <v-breadcrumbs :items="breadcrumbs" />
     </v-app-bar>
 

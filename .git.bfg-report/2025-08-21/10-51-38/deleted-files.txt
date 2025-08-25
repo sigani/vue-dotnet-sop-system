@@ -1,3 +1,0 @@
-e0b97a1bc1e6ab0c42ca542ece6196d3c130cc6a 323 appsettings.Development.json
-0c208ae9181e5e5717e47ec1bd59368aebc6066e 119 appsettings.Development.json
-936bb5f0a622a00a985bffcb6a98783d8d1ad403 347 appsettings.json

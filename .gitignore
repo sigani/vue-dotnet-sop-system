@@ -3,7 +3,7 @@
 # Node / frontend
 /nccsop.client/node_modules/
 /nccsop.client/dist/
-/nccsop.client/.env
+/nccsop.client/.env*
 
 # .NET / backend
 /NCCSOP.Server/bin/

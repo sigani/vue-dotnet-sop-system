@@ -34,7 +34,7 @@
                            icon
                            variant="text"
                            size="small">
-                      <v-icon icon="mdi-menu"></v-icon>
+                      <v-icon icon="mdi-dots-vertical"></v-icon>
                     </v-btn>
                   </template>
 
@@ -42,7 +42,7 @@
                     <v-list-item @click="">
                       <v-list-item-title>Edit</v-list-item-title>
                     </v-list-item>
-                    <v-list-item @click="">
+                    <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id">
                       <v-list-item-title style="color: red;">Delete</v-list-item-title>
                     </v-list-item>
                   </v-list>
@@ -75,7 +75,7 @@
                          icon
                          variant="text"
                          size="small">
-                    <v-icon icon="mdi-menu"></v-icon>
+                    <v-icon icon="mdi-dots-vertical"></v-icon>
                   </v-btn>
                 </template>
 
@@ -83,7 +83,7 @@
                   <v-list-item @click="">
                     <v-list-item-title>Edit</v-list-item-title>
                   </v-list-item>
-                  <v-list-item @click="">
+                  <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id">
                     <v-list-item-title style="color: red;">Delete</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -113,7 +113,7 @@
                            icon
                            variant="text"
                            size="small">
-                      <v-icon icon="mdi-menu"></v-icon>
+                      <v-icon icon="mdi-dots-vertical"></v-icon>
                     </v-btn>
                   </template>
 
@@ -121,7 +121,7 @@
                     <v-list-item @click="">
                       <v-list-item-title>Edit</v-list-item-title>
                     </v-list-item>
-                    <v-list-item @click="">
+                    <v-list-item @click="dialog_delete = true; selectedType = 'sop'; selectedId = sop.id">
                       <v-list-item-title style="color: red;">Delete</v-list-item-title>
                     </v-list-item>
                   </v-list>
@@ -154,7 +154,7 @@
                          icon
                          variant="text"
                          size="small">
-                    <v-icon icon="mdi-menu"></v-icon>
+                    <v-icon icon="mdi-dots-vertical"></v-icon>
                   </v-btn>
                 </template>
 
@@ -162,7 +162,7 @@
                   <v-list-item @click="">
                     <v-list-item-title>Edit</v-list-item-title>
                   </v-list-item>
-                  <v-list-item @click="">
+                  <v-list-item @click="dialog_delete = true; selectedType = 'sop'; selectedId = sop.id">
                     <v-list-item-title style="color: red;">Delete</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -182,8 +182,6 @@
           </v-img>
         </v-card>
       </v-col>
-
-
 
       <!-- Dialog -->
       <v-dialog v-model="dialog" max-width="500">
@@ -206,6 +204,26 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <!-- Delete Dialog-->
+      <v-dialog v-model="dialog_delete" max-width="500">
+        <v-card>
+          <v-card-title class="ma-2">
+            Delete
+          </v-card-title>
+          <v-card-text>
+            Are you sure?  This is an irreversible action.  
+          </v-card-text>
+          <v-card-text color="red">
+            All SOPs associated with this category will also be deleted.  You cannot delete categories that contain subcategories.
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click="dialog = false">Cancel</v-btn>
+            <v-btn color="red" @click="deleteItem()">Delete</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-row>
   </v-container>
 
@@ -223,12 +241,13 @@
 <script setup lang="ts">
   import { ref, computed, onMounted, watch } from 'vue'
   import { useCategoryStore } from '@/stores/categoryStore'
-  import { createCategory } from '@/services/categoryService'
-  import { createSOP } from '@/services/sopService'
+  import { createCategory, deleteCategory } from '@/services/categoryService'
+  import { createSOP, deleteSOP } from '@/services/sopService'
   import { useRoute } from 'vue-router'
 
   const image = ref<File | null>(null)
   const selectedType = ref('')
+  const selectedId = ref(0)
   const route = useRoute()
   const categoryStore = useCategoryStore()
   const loading = ref(true)
@@ -256,6 +275,7 @@
   // Dialog & new category input
   const dialog = ref(false)
   const newName = ref('')
+  const dialog_delete = ref(false)
 
   async function saveCategory() {
     const trimmedName = newName.value.trim()
@@ -310,6 +330,33 @@
 
     // Reset
     newName.value = ''
+    dialog.value = false
+    snackbar.value = true
+  }
+
+  async function deleteItem ()
+  {
+    if (selectedType.value == "cat") {
+      try {
+        const response = await deleteCategory(selectedId.value)
+        snackbarMessage.value = 'Category successfully deleted!'
+        delete categoryStore.categoriesMap[selectedId.value]
+      }
+      catch (error) {
+        snackbarMessage.value = 'Something went wrong :/' + error
+      }
+    }
+    else if (selectedType.value == "sop") {
+      try {
+        const response = await deleteSOP(selectedId.value)
+        snackbarMessage.value = 'SOP successfully deleted!'
+        delete categoryStore.sopsMap[selectedId.value]
+      }
+      catch (error) {
+        snackbarMessage.value = 'Something went wrong :/' + error
+      }
+    }
+    dialog_delete.value = false
     dialog.value = false
     snackbar.value = true
   }
