@@ -1,12 +1,14 @@
 <<script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useCategoryStore } from '@/stores/categoryStore'
-
+  import axios from 'axios'
+  const API_URL = import.meta.env.VITE_API_URL
   const route = useRoute()
   const router = useRouter()
   const categoryStore = useCategoryStore()
   const sidebar = ref(false)
+  const breadcrumbs = ref<{ title: string; to: string; disabled?: boolean }[]>([]);
 
   onMounted(async () => {
     await categoryStore.fetchCategories()
@@ -14,60 +16,95 @@
   })
 
   // Function to build breadcrumb array
-  function buildBreadcrumbs(id: number, isSop: boolean) {
-    const breadcrumbs: { title: string; to: string; disabled?: boolean }[] = []
+  async function buildBreadcrumbs(id: number, isSop: boolean) {
+    //const breadcrumbs: { title: string; to: string; disabled?: boolean }[] = []
     let currentId: number | null = id
 
     while (currentId) {
       if (isSop) {
-        const sop = categoryStore.sopsMap[currentId]
-        if (!sop || !sop.name) {
-          return null // invalid
-        }
+        const { data: sop } = await axios.get(`${API_URL}/sop/${currentId}`);
+        if (!sop || !sop.name) return null;
 
-        breadcrumbs.unshift({ title: sop.name, to: `/`, disabled: true })
-        currentId = sop.categoryId
-        isSop = false
+        breadcrumbs.value.unshift({ title: sop.name, to: `/sop/${currentId}`, disabled: true });
+        currentId = sop.categoryId;
+        isSop = false;
       } else {
-        const cat = categoryStore.categoriesMap[currentId]
-        if (!cat || !cat.name) {
-          return null // invalid
-        }
+        const { data: cat } = await axios.get(`${API_URL}/category/${currentId}`);
+        if (!cat || !cat.name) return null;
 
-        breadcrumbs.unshift({ title: cat.name, to: `/category/${currentId}` })
-        currentId = cat.parentCategoryId
+        breadcrumbs.value.unshift({ title: cat.name, to: `/category/${currentId}` });
+        currentId = cat.parentCategoryId;
       }
     }
 
-    breadcrumbs.unshift({ title: 'Home', to: '/' })
-    return breadcrumbs
+    breadcrumbs.value.unshift({ title: 'Home', to: '/' })
+    return breadcrumbs.value
   }
 
-  const breadcrumbs = computed(() => {
-    let idParam = route.params.id
-    let isSop = false
+  //const breadcrumbs = computed(async () => {
+  //  let idParam = route.params.id
+  //  let isSop = false
+
+  //  if (!idParam) {
+  //    isSop = true
+  //    idParam = route.params.sopId
+  //  }
+
+  //  if (!idParam) return [{ title: 'Home', to: '/' }]
+
+  //  const id = Number(idParam)
+  //  const items = await buildBreadcrumbs(id, isSop)
+
+  //  if (!items) {
+  //    router.push('/') // redirect to Home
+  //    return [{ title: 'Home', to: '/' }] // <-- always return array
+  //  }
+
+  //  if (items.length > 0) {
+  //    items[items.length - 1].disabled = true
+  //  }
+
+  //  return items
+  //})
+
+  async function loadBreadcrumbs() {
+    breadcrumbs.value = []
+    let idParam = route.params.id;
+    let isSop = false;
 
     if (!idParam) {
-      isSop = true
-      idParam = route.params.sopId
+      isSop = true;
+      idParam = route.params.sopId;
     }
 
-    if (!idParam) return [{ title: 'Home', to: '/' }]
+    if (!idParam) {
+      breadcrumbs.value = [{ title: 'Home', to: '/' }];
+      return;
+    }
 
-    const id = Number(idParam)
-    const items = buildBreadcrumbs(id, isSop)
+    const id = Number(idParam);
+    const items = await buildBreadcrumbs(id, isSop);
 
     if (!items) {
-      router.push('/') // redirect to Home
-      return [{ title: 'Home', to: '/' }] // <-- always return array
+      //router.push('/');
+      breadcrumbs.value = [{ title: 'Home', to: '/' }];
+      return;
     }
 
     if (items.length > 0) {
-      items[items.length - 1].disabled = true
+      items[items.length - 1].disabled = true;
     }
 
-    return items
-  })
+    breadcrumbs.value = items;
+  }
+
+  watch(
+    () => [route.params.id, route.params.sopId, route.name],
+    () => {
+      loadBreadcrumbs()
+    }
+  )
+
 </script>
 
 <template>

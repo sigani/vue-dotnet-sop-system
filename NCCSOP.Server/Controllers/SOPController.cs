@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace NCCSOP.Server.Controllers
 {
     [ApiController]
-    [Route("api/sop")]
+    [Route("sop")]
     public class SOPController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -144,6 +144,26 @@ namespace NCCSOP.Server.Controllers
             if (item == null)
                 return NotFound("SOP item not found");
 
+            // Delete the image file from disk
+            if (!string.IsNullOrEmpty(item.ImagePath))
+            {
+                var uploadsFolder = Path.Combine("uploads"); // same folder used in POST
+                var filePath = Path.Combine(uploadsFolder, item.ImagePath);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Optional: log the error
+                        Console.WriteLine($"Failed to delete image: {ex.Message}");
+                    }
+                }
+            }
+
             _db.SOPItems.Remove(item);
             await _db.SaveChangesAsync();
 
@@ -156,6 +176,28 @@ namespace NCCSOP.Server.Controllers
             var sop = await _db.SOPs.FindAsync(id);
             if (sop == null)
                 return NotFound();
+
+            // Delete associated images
+            var uploadsFolder = Path.Combine("uploads"); // match the folder used when saving
+            foreach (var item in sop.SOPItems)
+            {
+                if (!string.IsNullOrEmpty(item.ImagePath))
+                {
+                    var filePath = Path.Combine(uploadsFolder, item.ImagePath);
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Optional: log error but continue deleting other files
+                            Console.WriteLine($"Failed to delete image {item.ImagePath}: {ex.Message}");
+                        }
+                    }
+                }
+            }
 
             _db.SOPs.Remove(sop);
             await _db.SaveChangesAsync();

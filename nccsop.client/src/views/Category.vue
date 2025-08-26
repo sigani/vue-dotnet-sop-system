@@ -213,14 +213,15 @@
             Delete
           </v-card-title>
           <v-card-text>
-            Are you sure?  This is an irreversible action.  
+            Are you sure?  This is an irreversible action.
+            <v-card-text class="text-red" v-if="selectedType=='cat'">
+              All SOPs associated with this category will also be deleted.  You cannot delete categories that contain subcategories.
+            </v-card-text>
           </v-card-text>
-          <v-card-text color="red">
-            All SOPs associated with this category will also be deleted.  You cannot delete categories that contain subcategories.
-          </v-card-text>
+          
           <v-card-actions>
             <v-spacer />
-            <v-btn text @click="dialog = false">Cancel</v-btn>
+            <v-btn text @click="dialog_delete = false">Cancel</v-btn>
             <v-btn color="red" @click="deleteItem()">Delete</v-btn>
           </v-card-actions>
         </v-card>
@@ -345,7 +346,7 @@
         delete categoryStore.categoriesMap[selectedId.value]
       }
       catch (error) {
-        snackbarMessage.value = 'Something went wrong :/' + error
+        snackbarMessage.value = 'Something went wrong.  Double check to see if there are any subcategories first'
       }
     }
     else if (selectedType.value == "sop") {
@@ -355,7 +356,8 @@
         delete categoryStore.sopsMap[selectedId.value]
       }
       catch (error) {
-        snackbarMessage.value = 'Something went wrong :/' + error
+        snackbarMessage.value = error
+        console.log(error)
       }
     }
     dialog_delete.value = false

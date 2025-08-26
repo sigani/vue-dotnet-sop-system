@@ -30,10 +30,12 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UseCors();
+app.UsePathBase("/api");          // mount under /api
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors();                    // after routing, before auth
 app.UseAuthorization();
 app.MapControllers();
-app.MapFallbackToFile("/index.html");
+app.MapFallbackToFile("/index.html"); // SPA fallback, last
 
 app.Run();

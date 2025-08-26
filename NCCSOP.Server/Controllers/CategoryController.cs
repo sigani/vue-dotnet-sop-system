@@ -6,7 +6,7 @@ using NCCSOP.Server.Models;
 namespace NCCSOP.Server.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class CategoryController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -83,14 +83,20 @@ namespace NCCSOP.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var category = await _db.Categories.FindAsync(id);
-            if (category == null)
-                return NotFound();
+            try
+            {
+                var category = await _db.Categories.FindAsync(id);
+                if (category == null)
+                    return NotFound();
 
-            _db.Categories.Remove(category);
-            await _db.SaveChangesAsync();
+                _db.Categories.Remove(category);
+                await _db.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            } catch (Exception e)
+            {
+                return BadRequest(new {message = e.Message});
+            }
         }
     }
 }
