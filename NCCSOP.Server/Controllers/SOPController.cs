@@ -135,7 +135,7 @@ namespace NCCSOP.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] SOP updatedSOP)
+        public async Task<IActionResult> Update(int id, [FromBody] SOPUpdateDto updatedSOP)
         {
             if (updatedSOP == null || id != updatedSOP.Id)
             {
@@ -146,7 +146,6 @@ namespace NCCSOP.Server.Controllers
                 return NotFound();
             existingSOP.Name = updatedSOP.Name;
             existingSOP.CategoryId = updatedSOP.CategoryId;
-            existingSOP.SOPItems = updatedSOP.SOPItems;
             existingSOP.UpdatedAt = DateTime.UtcNow;
             _db.SOPs.Update(existingSOP);
             await _db.SaveChangesAsync();

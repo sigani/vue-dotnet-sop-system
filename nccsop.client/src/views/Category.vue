@@ -161,6 +161,9 @@
                 </template>
 
                 <v-list>
+                  <v-list-item @click="dialog_edit = true; selectedType = 'sop'; selectedId = sop.id;  newName = sop.name">
+                    <v-list-item-title>Edit</v-list-item-title>
+                  </v-list-item>
                   <v-list-item @click="dialog_delete = true; selectedType = 'sop'; selectedId = sop.id">
                     <v-list-item-title style="color: red;">Delete</v-list-item-title>
                   </v-list-item>
@@ -416,7 +419,6 @@
     dialog.value = false
     snackbar.value = true
   }
-
 
 
   async function deleteItem ()

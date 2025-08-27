@@ -8,12 +8,20 @@ namespace NCCSOP.Server.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        [JsonIgnore]
         public List<SOPItem> SOPItems { get; set; } = new List<SOPItem>();
         public int? CategoryId { get; set; } = null;
         [JsonIgnore]
         public Category? Category { get; set; } = null!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public class SOPUpdateDto
+    {
+        public int? Id { get; set; }
+        public string? Name { get; set; } = string.Empty;
+        public int? CategoryId { get; set; } = null;
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }
