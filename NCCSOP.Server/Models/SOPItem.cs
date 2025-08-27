@@ -12,7 +12,6 @@ namespace NCCSOP.Server.Models
 
     /// <summary>
     /// Represents a single item within a Standard Operating Procedure (SOP).
-    /// An SOPItem can be a text block, an image, or a step, and can be ordered within the SOP.
     /// </summary>
     public class SOPItem
     {
@@ -39,14 +38,12 @@ namespace NCCSOP.Server.Models
         public string? Name { get; set; } = null!;
 
         /// <summary>
-        /// The main content of the item.
-        /// For Text or Step types, this contains the textual description.
+        /// The main content of the item.  Basically the description.
         /// </summary>
         public string? Content { get; set; } = string.Empty;
 
         /// <summary>
-        /// The URL or file path of an image, if the item type is Image.
-        /// Null for Text or Step types.
+        /// The image name.
         /// </summary>
         public string? ImagePath { get; set; }
 
@@ -61,5 +58,13 @@ namespace NCCSOP.Server.Models
         /// Negative values can be used to indicate right-hand column placement (if using a 2-column layout).
         /// </summary>
         public int SortOrder { get; set; } = 0;
+    }
+
+    public class SOPUpdateItemDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? Content { get; set; }
+        public int SortOrder { get; set; }
     }
 }

@@ -1,28 +1,15 @@
 // categoryStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import type { Category, SOP } from '@/interfaces'
 import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const fetchCategories = async () => {
-  try {
-    const response = await axios.get(API_URL + '/category')
-    categoriesMap.value = response.data.reduce((map: any, c: any) => {
-      map[c.id] = c
-      return map
-    }, {})
-  } catch (err: any) {
-    if (axios.isAxiosError(err)) {
-      console.error('AxiosError fetching categories:', err.message, err.response?.status, err.response?.data)
-    } else {
-      console.error('Unknown error fetching categories:', err)
-    }
-  }
-}
-
 export const useCategoryStore = defineStore('categoryStore', () => {
-  const categoriesMap = ref<{ [id: number]: number[] }>({})
+
+  const search = ref("");
+  const categoriesMap = ref<{ [id: number]: Category }>({})
   const fetchCategories = async () => {
     try {
       const response = await axios.get(API_URL + '/category')
@@ -39,7 +26,7 @@ export const useCategoryStore = defineStore('categoryStore', () => {
     }
   }
 
-  const sopsMap = ref<{ [id: number]: number[] }>({})
+  const sopsMap = ref<{ [id: number]: SOP }>({})
   const fetchSops = async () => {
     try {
       const response = await axios.get(API_URL + '/sop')
@@ -72,30 +59,37 @@ export const useCategoryStore = defineStore('categoryStore', () => {
   const childCategories = computed(() => {
     if (!activeCategoryId.value) return []
     return Object.values(categoriesMap.value).filter(
-      (c: any) => c.parentCategoryId === activeCategoryId.value
+      (c: Category) => c.parentCategoryId === activeCategoryId.value
+    )
+  })
+
+  const searchedSOPs = computed(() => {
+    return Object.values(sopsMap.value).filter(
+      (c: Category) => c.name.includes(search.value)
     )
   })
 
   const childSops = computed(() => {
     if (!activeCategoryId.value) return []
     return Object.values(sopsMap.value).filter(
-      (s: any) => s.categoryId === activeCategoryId.value
+      (s: SOP) => s.categoryId === activeCategoryId.value
     )
   })
 
   const rootCategories = computed(() => {
     return Object.values(categoriesMap.value).filter(
-      (c: any) => !c.parentCategoryId // top-level
+      (c: Category) => !c.parentCategoryId // top-level
     )
   })
 
   const rootSOPs = computed(() => {
     return Object.values(sopsMap.value).filter(
-      (s: any) => !s.categoryId
+      (s: SOP) => !s.categoryId
     )
   })
 
   return {
+    searchedSOPs,
     categoriesMap,
     sopsMap,
     fetchCategories,

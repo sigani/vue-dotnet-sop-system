@@ -30,8 +30,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UsePathBase("/api");          // mount under /api
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseCors();                    // after routing, before auth
 app.UseAuthorization();

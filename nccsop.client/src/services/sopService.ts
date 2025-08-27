@@ -1,21 +1,9 @@
 import axios from 'axios';
+import type { AxiosResponse } from 'axios';
+import type { SOPItem, SOP } from '@/interfaces';
 
 // Base API URL
 export const API_URL = import.meta.env.VITE_API_URL + '/sop';
-
-interface SOP {
-  name: string;
-  categoryId: number;   
-}
-
-interface SOPItem {
-  name: string;
-  sopId: number;
-  content: string;
-  sortOrder: number;
-  image?: File; // make it optional if sometimes no file
-}
-
 export function insertSOPItem(item: SOPItem) {
     // Apparently if sending image, can only use FormData
     // But if no image, then just json
@@ -32,9 +20,8 @@ export function insertSOPItem(item: SOPItem) {
     });
 }
 
-export function getSOPDetails(id: number) {
-  if (id == null) return [];
-  return axios.get(`${API_URL}/${id}`)
+export function getSOPDetails(id: string | number): Promise<AxiosResponse<SOP>> {
+  return axios.get(`${API_URL}/${id}`);
 }
 
 export function getAllSOPs() {
@@ -55,6 +42,17 @@ export function deleteSOPDetail(sopId: number, detailId: number) {
 
 export function deleteSOP(id: number) {
   return axios.delete(`${API_URL}/${id}`);
+}
+
+export async function getFileFromServer(filename: string) {
+  const response = await axios.get(filename, {
+    responseType: 'blob' 
+  });
+  return response.data; 
+}
+
+export function updateSOPItem(sop: SOPItem) {
+  return axios.put(`${API_URL}/item/${sop.id}`, sop);
 }
 
 

@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace NCCSOP.Server.Controllers
 {
     [ApiController]
-    [Route("sop")]
+    [Route("api/sop")]
     public class SOPController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -132,6 +132,39 @@ namespace NCCSOP.Server.Controllers
                 return NotFound();
 
             return Ok(sop);
+        }
+
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> Update(int id, [FromBody] SOP updatedSOP)
+        //{
+        //    if (updatedSOP == null || id != updatedSOP.Id)
+        //        return BadRequest();
+        //    var existingSOP = await _db.SOPs.FindAsync(id);
+        //    if (existingSOP == null)
+        //        return NotFound();
+        //    existingSOP.Name = updatedSOP.Name;
+        //    existingSOP.CategoryId = updatedSOP.CategoryId;
+        //    existingSOP.SOPItems = updatedSOP.SOPItems;
+        //    existingSOP.UpdatedAt = DateTime.UtcNow;
+        //    _db.SOPs.Update(existingSOP);
+        //    await _db.SaveChangesAsync();
+        //    return NoContent();
+        //}
+
+        [HttpPut("item/{id}")]
+        public async Task<IActionResult> UpdateSOPItem(int id, [FromBody] SOPUpdateItemDto updatedItem)
+        {
+            if (updatedItem == null || id != updatedItem.Id)
+                return BadRequest();
+            var existingItem = await _db.SOPItems.FindAsync(id);
+            if (existingItem == null)
+                return NotFound();
+            existingItem.Name = updatedItem.Name;
+            existingItem.Content = updatedItem.Content;
+            existingItem.SortOrder = updatedItem.SortOrder;
+            _db.SOPItems.Update(existingItem);
+            await _db.SaveChangesAsync();
+            return NoContent();
         }
 
         [HttpDelete("{sopId}/{detailId}")]
