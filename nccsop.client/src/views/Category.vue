@@ -247,6 +247,7 @@
   import { createCategory, deleteCategory } from '@/services/categoryService'
   import { createSOP, deleteSOP } from '@/services/sopService'
   import { useRoute } from 'vue-router'
+  import type { Category, SOP } from '@/interfaces'
 
   const image = ref<File | null>(null)
   const selectedType = ref('')
@@ -305,8 +306,8 @@
       try {
         const response = await createCategory({
           name: newName.value,
-          parentCategoryId: route.params.id ? route.params.id : null,
-        })
+          parentCategoryId: route.params.id ? Number(route.params.id) : null,
+        } as Category)
 
         const createdCategory = response.data
         categoryStore.categoriesMap[createdCategory.id] = createdCategory
@@ -320,14 +321,18 @@
       try {
         const response = await createSOP({
           name: newName.value,
-          categoryId: route.params.id ? route.params.id : null,
-        })
+          categoryId: route.params.id ? Number(route.params.id) : undefined,
+        } as SOP)
 
         const createdSOP = response.data
         categoryStore.sopsMap[createdSOP.id] = createdSOP
         snackbarMessage.value = 'SOP created successfully!'
-      } catch (error) {
-        snackbarMessage.value = error
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          snackbarMessage.value = error.message
+        } else {
+          snackbarMessage.value = String(error)
+        }
       }
     }
 
@@ -345,8 +350,12 @@
         snackbarMessage.value = 'Category successfully deleted!'
         delete categoryStore.categoriesMap[selectedId.value]
       }
-      catch (error) {
-        snackbarMessage.value = 'Something went wrong.  Double check to see if there are any subcategories first'
+      catch (error: unknown) {
+        if (error instanceof Error) {
+          snackbarMessage.value = error.message
+        } else {
+          snackbarMessage.value = String(error)
+        }
       }
     }
     else if (selectedType.value == "sop") {
@@ -355,9 +364,12 @@
         snackbarMessage.value = 'SOP successfully deleted!'
         delete categoryStore.sopsMap[selectedId.value]
       }
-      catch (error) {
-        snackbarMessage.value = error
-        console.log(error)
+      catch (error: unknown) {
+        if (error instanceof Error) {
+          snackbarMessage.value = error.message
+        } else {
+          snackbarMessage.value = String(error)
+        }
       }
     }
     dialog_delete.value = false

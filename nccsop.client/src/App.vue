@@ -2,7 +2,10 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useCategoryStore } from '@/stores/categoryStore'
+  import type { Category, SOP } from '@/interfaces'
+
   import axios from 'axios'
+  import type { AxiosResponse } from 'axios'
   const API_URL = import.meta.env.VITE_API_URL
   const route = useRoute()
   const router = useRouter()
@@ -18,20 +21,21 @@
   // Function to build breadcrumb array
   async function buildBreadcrumbs(id: number, isSop: boolean) {
     //const breadcrumbs: { title: string; to: string; disabled?: boolean }[] = []
-    let currentId: number | null = id
+    let currentId: number | null | undefined = id
 
     while (currentId) {
       if (isSop) {
-        const { data: sop } = await axios.get(`${API_URL}/sop/${currentId}`);
+        const response: AxiosResponse<SOP> = await axios.get<SOP>(`${API_URL}/sop/${currentId}`);
+        const sop: SOP = response.data;
         if (!sop || !sop.name) return null;
 
         breadcrumbs.value.unshift({ title: sop.name, to: `/sop/${currentId}`, disabled: true });
         currentId = sop.categoryId;
         isSop = false;
       } else {
-        const { data: cat } = await axios.get(`${API_URL}/category/${currentId}`);
+        const response: AxiosResponse<Category> = await axios.get<Category>(`${API_URL}/category/${currentId}`);
+        const cat: Category = response.data;
         if (!cat || !cat.name) return null;
-
         breadcrumbs.value.unshift({ title: cat.name, to: `/category/${currentId}` });
         currentId = cat.parentCategoryId;
       }
@@ -116,10 +120,11 @@
         <v-toolbar-title >NCCSOP</v-toolbar-title>
       </v-btn>
       <v-breadcrumbs :items="breadcrumbs" />
+
     </v-app-bar>
 
     <!-- Side Navigation -->
-    <v-navigation-drawer app v-if="sidebar">
+    <v-navigation-drawer v-if="sidebar">
       <v-list>
         <v-list-item title="SOPs" to="/category"></v-list-item>
         <v-list-item title="Settings" to="/settings"></v-list-item>

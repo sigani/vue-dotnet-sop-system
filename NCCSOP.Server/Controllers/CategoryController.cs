@@ -6,7 +6,7 @@ using NCCSOP.Server.Models;
 namespace NCCSOP.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class CategoryController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
