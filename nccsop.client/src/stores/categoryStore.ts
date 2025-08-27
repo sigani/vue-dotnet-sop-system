@@ -65,6 +65,12 @@ export const useCategoryStore = defineStore('categoryStore', () => {
 
   const searchedSOPs = computed(() => {
     return Object.values(sopsMap.value).filter(
+      (c: SOP) => c.name.includes(search.value)
+    )
+  })
+
+  const searchedCategories = computed(() => {
+    return Object.values(categoriesMap.value).filter(
       (c: Category) => c.name.includes(search.value)
     )
   })
@@ -89,6 +95,8 @@ export const useCategoryStore = defineStore('categoryStore', () => {
   })
 
   return {
+    search,
+    searchedCategories,
     searchedSOPs,
     categoriesMap,
     sopsMap,

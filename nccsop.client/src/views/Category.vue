@@ -40,9 +40,6 @@
                   </template>
 
                   <v-list>
-                    <v-list-item @click="">
-                      <v-list-item-title>Edit</v-list-item-title>
-                    </v-list-item>
                     <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id">
                       <v-list-item-title style="color: red;">Delete</v-list-item-title>
                     </v-list-item>
@@ -81,9 +78,6 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="">
-                    <v-list-item-title>Edit</v-list-item-title>
-                  </v-list-item>
                   <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id">
                     <v-list-item-title style="color: red;">Delete</v-list-item-title>
                   </v-list-item>
@@ -119,9 +113,6 @@
                   </template>
 
                   <v-list>
-                    <v-list-item @click="">
-                      <v-list-item-title>Edit</v-list-item-title>
-                    </v-list-item>
                     <v-list-item @click="dialog_delete = true; selectedType = 'sop'; selectedId = sop.id">
                       <v-list-item-title style="color: red;">Delete</v-list-item-title>
                     </v-list-item>
@@ -160,9 +151,6 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="">
-                    <v-list-item-title>Edit</v-list-item-title>
-                  </v-list-item>
                   <v-list-item @click="dialog_delete = true; selectedType = 'sop'; selectedId = sop.id">
                     <v-list-item-title style="color: red;">Delete</v-list-item-title>
                   </v-list-item>

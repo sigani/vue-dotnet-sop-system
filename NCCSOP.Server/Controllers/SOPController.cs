@@ -152,19 +152,75 @@ namespace NCCSOP.Server.Controllers
         //}
 
         [HttpPut("item/{id}")]
-        public async Task<IActionResult> UpdateSOPItem(int id, [FromBody] SOPUpdateItemDto updatedItem)
+        public async Task<IActionResult> UpdateSOPItem(int id, [FromForm] SOPUpdateItemDto updatedItem)
         {
-            if (updatedItem == null || id != updatedItem.Id)
-                return BadRequest();
-            var existingItem = await _db.SOPItems.FindAsync(id);
-            if (existingItem == null)
-                return NotFound();
-            existingItem.Name = updatedItem.Name;
-            existingItem.Content = updatedItem.Content;
-            existingItem.SortOrder = updatedItem.SortOrder;
-            _db.SOPItems.Update(existingItem);
-            await _db.SaveChangesAsync();
-            return NoContent();
+            try
+            {
+                if (updatedItem == null || id != updatedItem.Id)
+                    return BadRequest();
+                var existingItem = await _db.SOPItems.FindAsync(id);
+                if (existingItem == null)
+                    return NotFound();
+                existingItem.Name = updatedItem.Name;
+                existingItem.Content = updatedItem.Content;
+                existingItem.SortOrder = updatedItem.SortOrder;
+                System.Diagnostics.Debug.WriteLine(existingItem.ImagePath + " new image: " + updatedItem.ImagePath);
+                if (existingItem.ImagePath != updatedItem.ImagePath)
+                {
+                    if (!string.IsNullOrEmpty(existingItem.ImagePath))
+                    {
+                        var uploadsFolder = Path.Combine("uploads");
+                        var oldFilePath = Path.Combine(uploadsFolder, existingItem.ImagePath);
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            try
+                            {
+                                System.IO.File.Delete(oldFilePath);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Optional: log the error
+                                Console.WriteLine($"Failed to delete old image: {ex.Message}");
+                            }
+                        }
+                    }
+
+                    // only upload a photo if they had a photo to upload.
+                    // maybe they deleted a photo who knows
+                    if (!string.IsNullOrEmpty(updatedItem.ImagePath))
+                    {
+                        var filePath = "";
+                        var fileExtension = "";
+                        var uniqueFileName = "";
+                        var uploadsFolder = Path.Combine("uploads");
+                        if (updatedItem.Image != null)
+                        {
+                            // Handle form-data
+                            fileExtension = Path.GetExtension(updatedItem.Image.FileName);
+                            uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                            uploadsFolder = Path.Combine("uploads");
+                            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                            filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                                await updatedItem.Image.CopyToAsync(stream);
+                        }
+                        existingItem.ImagePath = uniqueFileName;
+                    } else
+                    {
+                        existingItem.ImagePath = "";
+                    }
+                }
+
+                _db.SOPItems.Update(existingItem);
+                await _db.SaveChangesAsync();
+                return NoContent();
+            } catch (Exception e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            
         }
 
         [HttpDelete("{sopId}/{detailId}")]

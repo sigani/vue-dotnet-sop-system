@@ -115,12 +115,15 @@
   <v-app>
     <!-- Header / Top Navigation -->
     <v-app-bar app color="primary" dark>
-      <v-app-bar-nav-icon @click="sidebar = !sidebar"/>
+      <v-app-bar-nav-icon @click="sidebar = !sidebar" />
       <v-btn to="/category">
-        <v-toolbar-title >NCCSOP</v-toolbar-title>
+        <v-toolbar-title>NCCSOP</v-toolbar-title>
       </v-btn>
-      <v-breadcrumbs :items="breadcrumbs" />
 
+      <v-breadcrumbs :items="breadcrumbs" />
+      <v-btn to="/search">
+        <v-icon icon="mdi-magnify"></v-icon>
+      </v-btn>
     </v-app-bar>
 
     <!-- Side Navigation -->

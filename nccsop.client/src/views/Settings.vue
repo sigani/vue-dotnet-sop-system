@@ -5,47 +5,9 @@
   </v-container>
 </template>
 
-<script lang="ts">
-  import { defineComponent } from 'vue';
+<script setup lang="ts">
+  
 
-  export default defineComponent({
-    components: {
-    },
-    directives: {
-    },
-    filters: {
-    },
-    props: {
-    },
-    data() {
-      return {
-      }
-    },
-    computed: {
-    },
-    watch: {
-    },
-    beforeCreate() {
-    },
-    created() {
-    },
-    beforeMount() {
-    },
-    mounted() {
-    },
-    updated() {
-    },
-    activated() {
-    },
-    deactivated() {
-    },
-    beforeDestroy() {
-    },
-    destroyed() {
-    },
-    methods: {
-    },
-  });
 </script>
 
 <style>

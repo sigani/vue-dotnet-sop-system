@@ -1,6 +1,6 @@
 <template>
 
-  <v-container style="width:1920px">
+  <v-container>
     <v-card class="mb-2">
       <v-card-text>
         <h1>{{details?.name}}</h1>
@@ -11,9 +11,9 @@
       <v-btn text="CANCEL" class="ma-4 mt-0" color="red" @click="edit_mode=!edit_mode" v-if="edit_mode"></v-btn>
       <v-btn text="BACK" class="ma-4 mt-0" variant="outlined" @click="$router.go(-1)"></v-btn>
     </v-card>
-    <v-row  justify="center" class="w-auto" style="max-width: 1920px;">
+    <v-row justify="center" class="w-100" >
       <!-- Left column -->
-      <v-col cols="12" md="6" style="width: 1800px;">
+      <v-col cols="12" md="6" >
         <v-skeleton-loader v-if="loading" type="image"></v-skeleton-loader>
         <v-card v-for="(step, index) in validSteps"
                 :key="'left-' + step"
@@ -236,20 +236,25 @@
   }
 
   async function openEditDialog(item: SOPItem) {
-    dialog_newitem.value = true;
-    edit_item_mode.value = true;
-    selected_item.value = item;
+    try {
+      dialog_newitem.value = true;
+      edit_item_mode.value = true;
+      selected_item.value = item;
 
-    name.value = item.name;
-    content.value = item.content;
+      name.value = item.name;
+      content.value = item.content;
 
-    if (item.imageUrl) {
-      const blob = await getFileFromServer(item.imageUrl); // get blob
-      const filename = item.imageUrl.split('/').pop() || 'file.jpg'; // extract name from URL
-      file.value = new File([blob], filename, { type: blob.type, lastModified: Date.now() });
-    } else {
-      file.value = null;
+      if (item.imageUrl) {
+        const blob = await getFileFromServer(item.imageUrl); // get blob
+        const filename = item.imageUrl.split('/').pop() || 'file.jpg'; // extract name from URL
+        file.value = new File([blob], filename, { type: blob.type, lastModified: Date.now() });
+      } else {
+        file.value = null;
+      }
+    } catch (error) {
+      console.log(error)
     }
+    
   }
 
   async function deleteItem() {
@@ -291,6 +296,7 @@
       newSop.name = name.value
       newSop.content = content.value
       newSop.image = file.value ? file.value : null
+      newSop.imagePath = file.value?.arrayBuffer ? file.value.name : ""
       const response = await updateSOPItem(newSop);
 
       fetchSopDetails()

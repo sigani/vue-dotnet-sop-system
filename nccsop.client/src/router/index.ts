@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Callback from '../views/Callback.vue'
 import Category from '../views/Category.vue'
 import Settings from '../views/Settings.vue'
+import Search from '../views/Search.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
 import SOP from '../views/SOP.vue'
 
@@ -17,6 +18,11 @@ const routes = [
     path: '/',
     redirect: '/category',
     meta: { requiresAuth: true},
+  },
+  {
+    path: '/search',
+    component: Search,
+    meta: { requiresAuth: true }
   },
   {
     path: '/settings',

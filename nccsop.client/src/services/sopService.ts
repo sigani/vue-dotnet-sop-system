@@ -51,8 +51,20 @@ export async function getFileFromServer(filename: string) {
   return response.data; 
 }
 
-export function updateSOPItem(sop: SOPItem) {
-  return axios.put(`${API_URL}/item/${sop.id}`, sop);
+export function updateSOPItem(item: SOPItem) {
+  const formData = new FormData();
+  formData.append("Name", item.name);
+  formData.append("Id", item.id.toString());
+  formData.append("Content", item.content);
+  formData.append("SortOrder", item.sortOrder.toString());
+  if (item.image) {
+    formData.append("Image", item.image);
+  }
+  formData.append("ImagePath", item.imagePath ? item.imagePath : "");
+
+  return axios.put(`${API_URL}/item/${item.id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 }
 
 
