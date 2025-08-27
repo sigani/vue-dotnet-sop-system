@@ -8,6 +8,7 @@ namespace NCCSOP.Server.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        [JsonIgnore]
         public List<SOPItem> SOPItems { get; set; } = new List<SOPItem>();
         public int? CategoryId { get; set; } = null;
         [JsonIgnore]

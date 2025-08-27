@@ -134,22 +134,24 @@ namespace NCCSOP.Server.Controllers
             return Ok(sop);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Update(int id, [FromBody] SOP updatedSOP)
-        //{
-        //    if (updatedSOP == null || id != updatedSOP.Id)
-        //        return BadRequest();
-        //    var existingSOP = await _db.SOPs.FindAsync(id);
-        //    if (existingSOP == null)
-        //        return NotFound();
-        //    existingSOP.Name = updatedSOP.Name;
-        //    existingSOP.CategoryId = updatedSOP.CategoryId;
-        //    existingSOP.SOPItems = updatedSOP.SOPItems;
-        //    existingSOP.UpdatedAt = DateTime.UtcNow;
-        //    _db.SOPs.Update(existingSOP);
-        //    await _db.SaveChangesAsync();
-        //    return NoContent();
-        //}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] SOP updatedSOP)
+        {
+            if (updatedSOP == null || id != updatedSOP.Id)
+            {
+                return BadRequest();
+            }
+            var existingSOP = await _db.SOPs.FindAsync(id);
+            if (existingSOP == null)
+                return NotFound();
+            existingSOP.Name = updatedSOP.Name;
+            existingSOP.CategoryId = updatedSOP.CategoryId;
+            existingSOP.SOPItems = updatedSOP.SOPItems;
+            existingSOP.UpdatedAt = DateTime.UtcNow;
+            _db.SOPs.Update(existingSOP);
+            await _db.SaveChangesAsync();
+            return NoContent();
+        }
 
         [HttpPut("item/{id}")]
         public async Task<IActionResult> UpdateSOPItem(int id, [FromForm] SOPUpdateItemDto updatedItem)

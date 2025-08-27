@@ -40,6 +40,10 @@
                   </template>
 
                   <v-list>
+                    <v-list-item @click="dialog_edit = true; selectedType = 'cat'; selectedId = category.id;  newName = category.name">
+                      <v-list-item-title>Edit</v-list-item-title>
+                    </v-list-item>
+
                     <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id">
                       <v-list-item-title style="color: red;">Delete</v-list-item-title>
                     </v-list-item>
@@ -78,7 +82,10 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id">
+                  <v-list-item @click="dialog_edit = true; selectedType = 'cat'; selectedId = category.id;  newName = category.name">
+                    <v-list-item-title>Edit</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="dialog_delete = true; selectedType = 'cat'; selectedId = category.id;">
                     <v-list-item-title style="color: red;">Delete</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -113,6 +120,9 @@
                   </template>
 
                   <v-list>
+                    <v-list-item @click="dialog_edit = true; selectedType = 'sop'; selectedId = sop.id;  newName = sop.name">
+                      <v-list-item-title>Edit</v-list-item-title>
+                    </v-list-item>
                     <v-list-item @click="dialog_delete = true; selectedType = 'sop'; selectedId = sop.id">
                       <v-list-item-title style="color: red;">Delete</v-list-item-title>
                     </v-list-item>
@@ -194,6 +204,24 @@
         </v-card>
       </v-dialog>
 
+      <!-- Edit Dialog-->
+      <v-dialog v-model="dialog_edit" max-width="500">
+        <v-card>
+          <v-card-title class="ma-2">
+            Edit
+          </v-card-title>
+          <v-card-text>
+            <v-text-field label="Name" v-model="newName" />
+            <v-file-input label="Upload an image (optional)" v-model="image" variant="solo-filled" hint="Maximum size is xyz * xyz.  This will be the cover image for the item." persistent-hint></v-file-input>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click="dialog_edit = false">Cancel</v-btn>
+            <v-btn color="success" @click="editCategory">Save Changes</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <!-- Delete Dialog-->
       <v-dialog v-model="dialog_delete" max-width="500">
         <v-card>
@@ -206,7 +234,7 @@
               All SOPs associated with this category will also be deleted.  You cannot delete categories that contain subcategories.
             </v-card-text>
           </v-card-text>
-          
+
           <v-card-actions>
             <v-spacer />
             <v-btn text @click="dialog_delete = false">Cancel</v-btn>
@@ -232,8 +260,8 @@
 <script setup lang="ts">
   import { ref, computed, onMounted, watch } from 'vue'
   import { useCategoryStore } from '@/stores/categoryStore'
-  import { createCategory, deleteCategory } from '@/services/categoryService'
-  import { createSOP, deleteSOP } from '@/services/sopService'
+  import { createCategory, deleteCategory, updateCategory } from '@/services/categoryService'
+  import { createSOP, deleteSOP, updateSOP } from '@/services/sopService'
   import { useRoute } from 'vue-router'
   import type { Category, SOP } from '@/interfaces'
 
@@ -266,8 +294,9 @@
 
   // Dialog & new category input
   const dialog = ref(false)
-  const newName = ref('')
   const dialog_delete = ref(false)
+  const dialog_edit = ref(false)
+  const newName = ref('')
 
   async function saveCategory() {
     const trimmedName = newName.value.trim()
@@ -329,6 +358,66 @@
     dialog.value = false
     snackbar.value = true
   }
+
+  async function editCategory() {
+    const trimmedName = newName.value.trim()
+
+    //  Check if name is empty
+    if (!trimmedName) {
+      snackbarMessage.value = 'Category name cannot be empty.'
+      snackbar.value = true
+      return
+    }
+
+    //  Check if name is unique
+    const isDuplicate = Object.values(categoryStore.categoriesMap).some(
+      (c) => c.name.toLowerCase() === trimmedName.toLowerCase()
+    )
+    if (isDuplicate && selectedType.value == "cat") {
+      snackbarMessage.value = 'Category name must be unique.'
+      snackbar.value = true
+      return
+    }
+
+    // edit
+    if (selectedType.value == "cat") {
+      try {
+        var newCat = categoryStore.categoriesMap[selectedId.value];
+        newCat.name = newName.value;
+
+        const res = await updateCategory(selectedId.value, newCat);
+
+        snackbarMessage.value = 'Category updated successfully!'
+        console.log('Updated category:', res.data)
+      } catch (error) {
+        console.error('Failed to create category:', error)
+      }
+    } else if (selectedType.value == "sop") {
+      try {
+        var newSop = categoryStore.sopsMap[selectedId.value];
+        newSop.name = newName.value;
+
+        const res = await updateSOP(selectedId.value, newSop);
+
+        snackbarMessage.value = 'SOP updated successfully!'
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          snackbarMessage.value = error.message
+        } else {
+          snackbarMessage.value = String(error)
+        }
+      }
+
+      dialog_edit.value = false;
+    }
+
+    // Reset
+    newName.value = ''
+    dialog.value = false
+    snackbar.value = true
+  }
+
+
 
   async function deleteItem ()
   {

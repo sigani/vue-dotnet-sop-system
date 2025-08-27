@@ -51,6 +51,12 @@ export async function getFileFromServer(filename: string) {
   return response.data; 
 }
 
+export function updateSOP(id: number, updatedSop: SOP) {
+  console.log(`${API_URL}/${id}`);
+  console.log(`${updatedSop.id}`);
+  return axios.put(`${API_URL}/${id}`, updatedSop);
+}
+
 export function updateSOPItem(item: SOPItem) {
   const formData = new FormData();
   formData.append("Name", item.name);

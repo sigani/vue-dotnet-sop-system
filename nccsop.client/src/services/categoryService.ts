@@ -17,6 +17,7 @@ export function createCategory(category: Category) {
 }
 
 export function updateCategory(id: number, category: Category) {
+  console.log(`${API_URL}/${id}`);
   return axios.put(`${API_URL}/${id}`, category);
 }
 
